@@ -9,10 +9,10 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(value = Include.NON_NULL)
 public class SessionDTO {
-	
+
 	private String token;
 	private String email;
-	private String userUid;
+	private String userUuid;
 	private String name;
 
 	public SessionDTO() {
@@ -36,12 +36,12 @@ public class SessionDTO {
 		this.email = email;
 	}
 
-	public String getUserUid() {
-		return userUid;
+	public String getUserUuid() {
+		return userUuid;
 	}
 
-	public void setUserUid(String userUid) {
-		this.userUid = userUid;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
 	}
 
 	public String getName() {
@@ -59,7 +59,7 @@ public class SessionDTO {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(userUid).toHashCode();
+		return new HashCodeBuilder(17, 37).append(userUuid).toHashCode();
 	}
 
 	@Override
@@ -74,6 +74,6 @@ public class SessionDTO {
 			return false;
 		}
 		SessionDTO other = (SessionDTO) obj;
-		return new EqualsBuilder().append(this.userUid, other.userUid).isEquals();
+		return new EqualsBuilder().append(this.userUuid, other.userUuid).isEquals();
 	}
 }

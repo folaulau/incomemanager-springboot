@@ -65,16 +65,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
 	private Authentication loginWithPassword(String email, String password) {
 		log.info("loginWithPassword({})", email);
-		Optional<User> optUser = userService.findByEmail(email);
+		User user = userService.getByEmail(email);
 
-		if (!optUser.isPresent()) {
+		if (user==null) {
 			log.info("user not found");
 			throw new UsernameNotFoundException("Username or password is invalid");
 		}
 		
 		log.info("user found for {}", email);
-		
-		User user = optUser.get();
 		
 		log.info("user: {}", ObjectUtils.toJson(user));
 		

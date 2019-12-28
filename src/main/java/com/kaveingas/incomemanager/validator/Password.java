@@ -10,14 +10,14 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 @Documented
-@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE })
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = EmailValidator.class)
-public @interface Email {
+@Constraint(validatedBy = PasswordValidator.class)
+public @interface Password {
 
-	String message() default "email is invalid";
+    String message() default "password is invalid";
 
-	Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-	Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 }

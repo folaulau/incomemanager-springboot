@@ -1,13 +1,23 @@
 package com.kaveingas.incomemanager.dto;
 
+import javax.validation.constraints.Min;
+
+import com.kaveingas.incomemanager.validator.Email;
+import com.kaveingas.incomemanager.validator.NotEmptyString;
+import com.kaveingas.incomemanager.validator.Password;
+
 public class SignupRequestDTO {
 
+	@NotEmptyString(message = "name is required")
     private String name;
 
+    @Email(message = "email is required")
     private String email;
 
+    @Min(value = 12, message = "age is invalid")
     private int age;
 
+    @Password
     private String password;
 
 	public SignupRequestDTO() {

@@ -24,6 +24,7 @@ import com.kaveingas.incomemanager.dto.SignupRequestDTO;
 import com.kaveingas.incomemanager.dto.UserDTO;
 import com.kaveingas.incomemanager.dto.EntityDTOMapper;
 import com.kaveingas.incomemanager.role.Role;
+import com.kaveingas.incomemanager.role.RoleType;
 import com.kaveingas.incomemanager.utils.HttpUtils;
 import com.kaveingas.incomemanager.utils.ObjectUtils;
 
@@ -90,13 +91,13 @@ public class UserController {
 	
 
 	
-	@Secured(value={Role.USER})
+	@Secured(value={RoleType.ROLE_USER})
 	@ApiOperation(value = "Get Member By Uuid")
-	@GetMapping("/users/{uid}")
-	public ResponseEntity<UserDTO> getUserByUid(@RequestHeader(name="token", required=true) String token, @ApiParam(name="uid", required=true, value="uid") @PathVariable("uid") String uid){
-		log.debug("getUserByUid(..)");
+	@GetMapping("/users/{uuid}")
+	public ResponseEntity<UserDTO> getUserByUuid(@RequestHeader(name="token", required=true) String token, @ApiParam(name="uuid", required=true, value="uuid") @PathVariable("uuid") String uuid){
+		log.debug("getUserByUuid(..)");
 		
-		User user = userService.getByUid(uid);
+		User user = userService.getByUuid(uuid);
 		
 		UserDTO userDto = entityDTOMapper.userToUserDTO(user);
 		

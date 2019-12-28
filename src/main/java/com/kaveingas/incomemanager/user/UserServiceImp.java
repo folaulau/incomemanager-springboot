@@ -13,15 +13,16 @@ import org.springframework.stereotype.Service;
 
 import com.kaveingas.incomemanager.dto.SessionDTO;
 import com.kaveingas.incomemanager.dto.SignupRequestDTO;
+import com.kaveingas.incomemanager.account.Account;
 import com.kaveingas.incomemanager.dto.EntityDTOMapper;
 import com.kaveingas.incomemanager.jwt.JwtPayload;
 import com.kaveingas.incomemanager.jwt.JwtTokenUtils;
 import com.kaveingas.incomemanager.role.Role;
+import com.kaveingas.incomemanager.role.RoleType;
 import com.kaveingas.incomemanager.utils.HttpUtils;
 import com.kaveingas.incomemanager.utils.ObjectUtils;
 import com.kaveingas.incomemanager.utils.PasswordUtils;
 import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
-
 
 @Service
 public class UserServiceImp implements UserService {
@@ -32,7 +33,7 @@ public class UserServiceImp implements UserService {
 	private EntityManager entityManager;
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserDAO userDAO;
 
 	@Autowired
 	private HttpServletRequest request;
@@ -41,71 +42,46 @@ public class UserServiceImp implements UserService {
 	private EntityDTOMapper userMapper;
 
 	@Override
-	public User create(User user) {
-		return userRepository.saveAndFlush(user);
-	}
-
-	@Override
 	public User getById(Long id) {
 		// TODO Auto-generated method stub
-
-		return userRepository.getById(id);
-	}
-
-	@Override
-	public Optional<User> findByUid(String uuid) {
-		// TODO Auto-generated method stub
-		return userRepository.findByUid(uuid);
-	}
-
-	@Override
-	public User getByUid(String uid) {
-		// TODO Auto-generated method stub
-		return userRepository.getByUid(uid);
+		return userDAO.getById(id);
 	}
 
 	@Override
 	public User getProfileById(Long id) {
-
-		User user = userRepository.getById(id);
-
-		log.info("user: {}", ObjectUtils.toJson(user));
-
-		return user;
+		// TODO Auto-generated method stub
+		return userDAO.getById(id);
 	}
 
 	@Override
-	public Optional<User> findByEmail(String email) {
+	public User getByUuid(String uuid) {
 		// TODO Auto-generated method stub
-		return this.userRepository.findByEmail(email);
+		return userDAO.getByUuid(uuid);
 	}
 
 	@Override
 	public User getByEmail(String email) {
 		// TODO Auto-generated method stub
-		return this.userRepository.getByEmail(email);
+		return userDAO.getByEmail(email);
 	}
 
 	@Override
 	public SessionDTO signUp(SignupRequestDTO signupRequest) {
 		log.debug("signup(..)");
+		UserUtils.validateSignup(userDAO, signupRequest);
+		
 		User user = this.userMapper.signupRequestToUser(signupRequest);
-
+		user.setAccount(new Account());
+		
 		Role role = new Role();
-		role.setAuthority(Role.USER);
-		role.addUser(user);
-		user.addRole(role);
-
-		role = new Role();
-		role.setAuthority(Role.MANAGER);
+		role.setAuthority(RoleType.USER);
 		role.addUser(user);
 		user.addRole(role);
 
 		user.setPassword(PasswordUtils.hashPassword(user.getPassword()));
-		user.setUid(RandomGeneratorUtils.getUserUuid());
 		log.debug("user: {}", ObjectUtils.toJson(user));
 
-		user = this.create(user);
+		user = userDAO.save(user);
 
 		log.debug("saved user: {}", ObjectUtils.toJson(user));
 		JwtPayload jwtpayload = new JwtPayload(user, RandomGeneratorUtils.getJwtUuid());
@@ -113,16 +89,16 @@ public class UserServiceImp implements UserService {
 		String clientUserAgent = HttpUtils.getRequestUserAgent(request);
 
 		jwtpayload.setDeviceId(clientUserAgent);
-		
+
 		log.debug("jwtpayload: {}", ObjectUtils.toJson(jwtpayload));
-		
+
 		String jwtToken = JwtTokenUtils.generateToken(jwtpayload);
 
 		SessionDTO ssnDto = new SessionDTO();
 		ssnDto.setEmail(user.getEmail());
-		ssnDto.setUserUid(user.getUid());
+		ssnDto.setUserUuid(user.getUuid());
 		ssnDto.setToken(jwtToken);
-		
+
 		return ssnDto;
 	}
 }

@@ -127,7 +127,7 @@ public class CustomLoginFilter extends AbstractAuthenticationProcessingFilter {
 		
 		SessionDTO sessionDto = new SessionDTO();
 		sessionDto.setEmail(email);
-		sessionDto.setUserUid(user.getUid());
+		sessionDto.setUserUuid(user.getUuid());
 		sessionDto.setToken(jwtToken);
 		
 		response.setStatus(HttpStatus.OK.value());

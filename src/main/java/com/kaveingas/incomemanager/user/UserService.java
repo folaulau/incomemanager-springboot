@@ -7,17 +7,11 @@ import com.kaveingas.incomemanager.dto.SignupRequestDTO;
 
 public interface UserService {
 	
-	User create(User user);
-	
 	User getById(Long id);
 	
 	User getProfileById(Long id);
 	
-	User getByUid(String uid);
-	
-	Optional<User> findByUid(String uid);
-
-	Optional<User> findByEmail(String email);
+	User getByUuid(String uid);
 	
 	User getByEmail(String email);
 

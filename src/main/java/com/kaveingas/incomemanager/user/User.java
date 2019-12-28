@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
@@ -31,9 +32,11 @@ import org.hibernate.annotations.Where;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.kaveingas.incomemanager.account.Account;
 import com.kaveingas.incomemanager.address.Address;
 import com.kaveingas.incomemanager.role.Role;
 import com.kaveingas.incomemanager.utils.ApiSessionUtils;
+import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
 
 @JsonInclude(value = Include.NON_NULL)
 @Where(clause = "deleted = 'F'")
@@ -48,8 +51,12 @@ public class User implements Serializable {
 	@Column(name = "id", nullable = false, updatable = false, unique = true)
 	private Long id;
 
-	@Column(name = "uid", unique = true, nullable = false, updatable = false)
-	private String uid;
+	@Column(name = "uuid", unique = true, nullable = false, updatable = false)
+	private String uuid;
+	
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "account_id")
+	private Account account;
 
 	@Column(name = "email", nullable = false, unique = true)
 	private String email;
@@ -101,13 +108,15 @@ public class User implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
+	
 
-	public String getUid() {
-		return uid;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setUid(String uid) {
-		this.uid = uid;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public Set<Role> getRoles() {
@@ -185,6 +194,16 @@ public class User implements Serializable {
 	public void setDeletedBy(Long deletedBy) {
 		this.deletedBy = deletedBy;
 	}
+	
+	
+
+	public Account getAccount() {
+		return account;
+	}
+
+	public void setAccount(Account account) {
+		this.account = account;
+	}
 
 	@Override
 	public String toString() {
@@ -193,7 +212,7 @@ public class User implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(this.id).append(this.email).append(this.uid).toHashCode();
+		return new HashCodeBuilder(17, 37).append(this.id).append(this.email).append(this.uuid).toHashCode();
 
 		// return HashCodeBuilder.reflectionHashCode(this);
 	}
@@ -210,12 +229,13 @@ public class User implements Serializable {
 			return false;
 		}
 		User other = (User) obj;
-		return new EqualsBuilder().append(this.id, other.id).append(this.email, other.email).append(this.uid, other.uid)
+		return new EqualsBuilder().append(this.id, other.id).append(this.email, other.email).append(this.uuid, other.uuid)
 				.isEquals();
 	}
 
 	@PrePersist
 	private void preCreate() {
+		this.uuid = RandomGeneratorUtils.getUserUuid();
 		this.createdBy = ApiSessionUtils.getCreateBy();
 		this.updatedBy = this.createdBy;
 	}

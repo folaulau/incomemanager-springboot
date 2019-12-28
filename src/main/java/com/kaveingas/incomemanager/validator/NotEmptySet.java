@@ -12,10 +12,10 @@ import javax.validation.Payload;
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = EmailValidator.class)
-public @interface Email {
+@Constraint(validatedBy = NotEmptySetValidator.class)
+public @interface NotEmptySet {
 
-	String message() default "email is invalid";
+	String message() default "list is empty";
 
 	Class<?>[] groups() default {};
 

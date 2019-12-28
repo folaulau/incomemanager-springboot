@@ -52,29 +52,41 @@ public final class RandomGeneratorUtils {
 	public static String getAlphaNumeric(int length) {
 		return RandomStringUtils.randomAlphanumeric(length);
 	}
-	
-	public static List<Integer> getNumbersInRangeAndOffset(int start, int finish, int offset){
+
+	public static List<Integer> getNumbersInRangeAndOffset(int start, int finish, int offset) {
 		List<Integer> numbers = new ArrayList<>();
-		for(int i=start;i<finish;i+=offset) {
+		for (int i = start; i < finish; i += offset) {
 			numbers.add(i);
 		}
 		return numbers;
 	}
 
-//	public static String getUuid() {
-//		StringBuilder uuid = new StringBuilder();
-//		for (int i = 0; i < 4; i++) {
-//			uuid.append(RandomStringUtils.randomAlphabetic(5));
-//		}
-//		return uuid.toString();
-//	}
-	
 	public static String getUserUuid() {
-		return "user-"+UUID.randomUUID().toString()+"-"+RandomStringUtils.randomAlphabetic(10);
+		return "user-" + UUID.randomUUID().toString();
 	}
-	
+
 	public static String getJwtUuid() {
-		return "jwt-"+UUID.randomUUID().toString()+"-"+RandomStringUtils.randomAlphabetic(10);
+		return "jwt-" + UUID.randomUUID().toString();
+	}
+
+	public static String getSpendingItemUuid() {
+		// TODO Auto-generated method stub
+		return "spitm-" + UUID.randomUUID().toString();
+	}
+
+	public static String getIncomeUuid() {
+		// TODO Auto-generated method stub
+		return "income-" + UUID.randomUUID().toString();
+	}
+
+	public static String getExpenseUuid() {
+		// TODO Auto-generated method stub
+		return "exp-" + UUID.randomUUID().toString();
+	}
+
+	public static String getAccountUuid() {
+		// TODO Auto-generated method stub
+		return "acct-" + UUID.randomUUID().toString();
 	}
 
 }

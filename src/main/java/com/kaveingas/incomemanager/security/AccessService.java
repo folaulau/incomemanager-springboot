@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.kaveingas.incomemanager.role.Role;
+import com.kaveingas.incomemanager.role.RoleType;
 
 
 @Service
@@ -20,7 +21,7 @@ public class AccessService {
 		return auth != null && auth.isAuthenticated()
 				&& auth.getAuthorities().stream()
 						.anyMatch(role -> Arrays
-								.asList(Role.ADMIN)
+								.asList(RoleType.ADMIN)
 								.contains(role.getAuthority().trim()));
 	}
 }

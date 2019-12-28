@@ -12,10 +12,10 @@ import javax.validation.Payload;
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = EmailValidator.class)
-public @interface Email {
+@Constraint(validatedBy = NotInvalidAmountValidator.class)
+public @interface NotInvalidAmount {
 
-	String message() default "email is invalid";
+	String message() default "not a valid amount";
 
 	Class<?>[] groups() default {};
 

@@ -64,7 +64,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 			if (traceArray != null && traceArray.length > 0) {
 				for (int i = 0; i < traceArray.length; i++) {
 					errorString.append(traceArray[i].toString());
-					if (StringUtils.contains(traceArray[i].getClassName(), "sidecarhealth")) {
+					if (StringUtils.contains(traceArray[i].getClassName(), " bug")) {
 						break;
 					} else {
 						errorString.append(",");
@@ -181,19 +181,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        log.debug("handleMethodArgumentNotValid(..)");
+        log.warn("handleMethodArgumentNotValid(..)");
 
-        List<String> errors = ValidationUtils.getErrors(ex.getBindingResult());
-        log.debug("errors: {}", errors);
+//        List<String> errors = ValidationUtils.getErrors(ex.getBindingResult());
+//        log.warn("errors: {}", errors);
+        
+        List<ApiSubError> errors = ValidationUtils.getFormErrors(ex.getBindingResult());
+        log.warn("errors: {}", errors);
+        
         StringBuffer bindingErrors = null;
         if (errors != null && !errors.isEmpty()) {
             bindingErrors = new StringBuffer();
-            for (String error : errors) {
-                bindingErrors.append(error + "\n");
+            for (ApiSubError error : errors) {
+                bindingErrors.append(error.getMessage() + "\n");
             }
         }
         
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Something went wrong", bindingErrors.toString());
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, bindingErrors.toString(), bindingErrors.toString(), errors);
 
         return new ResponseEntity<>(apiError, status);
     }
@@ -224,6 +228,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, errorMessage, errorMessage);
         return new ResponseEntity<>(apiError, status);
     }
+    
+    
 
     /**
      * @param apiError

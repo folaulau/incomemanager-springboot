@@ -51,7 +51,7 @@ public class JwtPayload implements Serializable {
 	}
 	
 	public JwtPayload(User user, String jti) {
-		this(null,jti,user.getEmail(),user.getUid(),user.getAuthorities(),null,null,null,null);
+		this(null,jti,user.getEmail(),user.getUuid(),user.getAuthorities(),null,null,null,null);
 	}
 
 	public JwtPayload(String iss, String jti, String email, String uid, List<String> authorities, String deviceId, Date iat,
