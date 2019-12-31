@@ -71,23 +71,7 @@ public class ValidationUtils {
 			result = false;
 			return result;
 		} else {
-			StringBuilder patternBuilder = new StringBuilder();
-			// lowercase
-			patternBuilder.append("((?=.*[a-z])");
-			// one number
-			patternBuilder.append("(?=.*\\d)");
-			// special character
-			patternBuilder.append("(?=.*[,~,!,@,#,$,%,^,&,*,(,),-,-,_,=,+,[,{,],},|,;,:,<,>,/,?])");
-			// uppercase
-			patternBuilder.append("(?=.*[A-Z])");
-			// length
-			patternBuilder.append(".{" + PASSWORD_MIN_LENGTH + "," + PASSWORD_MAX_LENGTH + "})");
-			// System.out.println("password: "+password);
-			// System.out.println("regex: "+patternBuilder.toString());
-			Pattern pattern = Pattern.compile(patternBuilder.toString());
-			result = pattern.matcher(password).matches();
-			// System.out.println("valid: "+ result);
-			return result;
+			return password.length()>6;
 		}
 	}
 

@@ -57,6 +57,7 @@ public class UserController {
 	@PostMapping("/signup")
 	public ResponseEntity<SessionDTO> signUp(@ApiParam(name="user", required=true, value="user") @Valid @RequestBody SignupRequestDTO signupRequest){
 		log.debug("signUp(..)");
+		log.debug("signupRequest: {}",ObjectUtils.toJson(signupRequest));
 		SessionDTO userSession = userService.signUp(signupRequest);
 		log.debug("userSession: {}",ObjectUtils.toJson(userSession));
 		return new ResponseEntity<>(userSession, HttpStatus.OK);

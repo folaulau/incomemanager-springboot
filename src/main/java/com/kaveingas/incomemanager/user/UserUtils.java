@@ -1,5 +1,7 @@
 package com.kaveingas.incomemanager.user;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 import com.kaveingas.incomemanager.dto.SignupRequestDTO;
@@ -8,25 +10,28 @@ import com.kaveingas.incomemanager.exception.ApiException;
 import com.kaveingas.incomemanager.utils.ValidationUtils;
 
 public interface UserUtils {
+	
+	Logger log = LoggerFactory.getLogger(UserUtils.class);
 
 	public static void validateSignup(UserDAO userDAO, SignupRequestDTO signupRequest) {
-
-		if (signupRequest.getName() == null || signupRequest.getName().length() <= 0) {
-			throw new ApiException(new ApiError(HttpStatus.BAD_REQUEST, "Name is required",
-					"name is empty. name=" + signupRequest.getName()));
+		log.info("validateSignup(..)");
+		
+		if (signupRequest.getFirstName() == null || signupRequest.getFirstName().length() <= 0) {
+			throw new ApiException(new ApiError(HttpStatus.BAD_REQUEST, "First Name is required",
+					"first name is empty. first name=" + signupRequest.getFirstName()));
+		}
+		
+		if (signupRequest.getLastName() == null || signupRequest.getLastName().length() <= 0) {
+			throw new ApiException(new ApiError(HttpStatus.BAD_REQUEST, "Last Name is required",
+					"last name is empty. last name=" + signupRequest.getLastName()));
 		}
 
-		if (ValidationUtils.isValidPassword(signupRequest.getPassword())) {
+		if (ValidationUtils.isValidPassword(signupRequest.getPassword())==false) {
 			throw new ApiException(new ApiError(HttpStatus.BAD_REQUEST, "Password is invalid",
 					"invalid password. password=" + signupRequest.getPassword()));
 		}
 
-		if (signupRequest.getAge() <= 12) {
-			throw new ApiException(new ApiError(HttpStatus.BAD_REQUEST, "Invalid age",
-					"age is less than 12. age=" + signupRequest.getAge()));
-		}
-
-		if (ValidationUtils.isValidEmail(signupRequest.getEmail())) {
+		if (ValidationUtils.isValidEmail(signupRequest.getEmail())==false) {
 			throw new ApiException(new ApiError(HttpStatus.BAD_REQUEST, "Email is invalid",
 					"email is invalid. email=" + signupRequest.getEmail()));
 		}

@@ -9,7 +9,9 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
 
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {	
-		return ValidationUtils.isValidPassword(value);
+		boolean valid =  ValidationUtils.isValidPassword(value);
+		System.out.println("valid password: "+valid);
+		return valid;
 	}
 
 }

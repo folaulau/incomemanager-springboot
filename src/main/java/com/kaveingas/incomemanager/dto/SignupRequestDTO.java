@@ -1,36 +1,42 @@
 package com.kaveingas.incomemanager.dto;
 
-import javax.validation.constraints.Min;
-
 import com.kaveingas.incomemanager.validator.Email;
 import com.kaveingas.incomemanager.validator.NotEmptyString;
 import com.kaveingas.incomemanager.validator.Password;
 
 public class SignupRequestDTO {
 
-	@NotEmptyString(message = "name is required")
-    private String name;
+	@NotEmptyString(message = "first name is required")
+	private String firstName;
 
-    @Email(message = "email is required")
-    private String email;
+	@NotEmptyString(message = "last name is required")
+	private String lastName;
 
-    @Min(value = 12, message = "age is invalid")
-    private int age;
+	@Email(message = "email is required")
+	private String email;
 
-    @Password
-    private String password;
+	@Password
+	private String password;
 
 	public SignupRequestDTO() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public String getName() {
-		return name;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getEmail() {
@@ -41,14 +47,6 @@ public class SignupRequestDTO {
 		this.email = email;
 	}
 
-	public int getAge() {
-		return age;
-	}
-
-	public void setAge(int age) {
-		this.age = age;
-	}
-
 	public String getPassword() {
 		return password;
 	}
@@ -56,8 +54,5 @@ public class SignupRequestDTO {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-    
-    
 
-    
 }
