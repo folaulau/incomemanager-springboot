@@ -54,7 +54,6 @@ public class Expense implements Serializable {
 	@Column(name = "title")
 	private String title;
 
-	// RECEIPT, ITEM
 	@Column(name = "type")
 	private String type;
 

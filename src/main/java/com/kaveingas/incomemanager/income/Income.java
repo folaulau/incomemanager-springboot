@@ -44,9 +44,15 @@ public class Income implements Serializable {
 	@Column(name = "uuid", updatable = false, nullable = false, unique = true)
 	private String uuid;
 
+	@Column(name = "company_name")
+	private String companyName;
+
 	// WEEKLY, BI WEEKLY, MONTHLY
 	@Column(name = "recurrence")
 	private String recurrence;
+
+	@Column(name = "paycheck_net_amount")
+	private double paycheckNetAmount;
 
 	@Type(type = "true_false")
 	@Column(name = "deleted", columnDefinition = "char(1) default 'F'")
@@ -155,6 +161,22 @@ public class Income implements Serializable {
 
 	public void setUpdatedBy(Long updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public double getPaycheckNetAmount() {
+		return paycheckNetAmount;
+	}
+
+	public void setPaycheckNetAmount(double paycheckNetAmount) {
+		this.paycheckNetAmount = paycheckNetAmount;
 	}
 
 	@Override
