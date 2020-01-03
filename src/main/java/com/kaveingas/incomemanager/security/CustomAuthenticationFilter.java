@@ -53,7 +53,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		log.debug("doFilterInternal(...)");
 		String token = request.getHeader("token");
-		log.debug("Token: {}", token);
+		log.info("Token: {}", token);
 
 		if (token == null) {
 			ObjectNode erroMsg = ObjectUtils.getObjectNode();
@@ -79,7 +79,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		log.debug("valid request, jwtPayload: {}", ObjectUtils.toJson(jwtPayload));
+		log.info("valid request, jwtPayload: {}", ObjectUtils.toJson(jwtPayload));
 
 		setRequestSecurityAuthentication(jwtPayload);
 
@@ -96,6 +96,6 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		SecurityContextHolder.getContext().setAuthentication(
-				new UsernamePasswordAuthenticationToken(jwtPayload, jwtPayload.getUid(), authorities));
+				new UsernamePasswordAuthenticationToken(jwtPayload, jwtPayload.getUuid(), authorities));
 	}
 }

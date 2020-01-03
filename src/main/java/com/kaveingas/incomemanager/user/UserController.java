@@ -1,5 +1,6 @@
 package com.kaveingas.incomemanager.user;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -23,8 +24,10 @@ import com.kaveingas.incomemanager.dto.SessionDTO;
 import com.kaveingas.incomemanager.dto.SignupRequestDTO;
 import com.kaveingas.incomemanager.dto.UserDTO;
 import com.kaveingas.incomemanager.dto.EntityDTOMapper;
+import com.kaveingas.incomemanager.dto.LoginRequestDTO;
 import com.kaveingas.incomemanager.role.Role;
 import com.kaveingas.incomemanager.role.RoleType;
+import com.kaveingas.incomemanager.security.auth.AuthenticationService;
 import com.kaveingas.incomemanager.utils.HttpUtils;
 import com.kaveingas.incomemanager.utils.ObjectUtils;
 
@@ -46,6 +49,9 @@ public class UserController {
 	@Autowired
 	private EntityDTOMapper entityDTOMapper;
 	
+	@Autowired
+	private AuthenticationService authenticationService;
+	
 	/**
 	 * 
 	 * @param apiKey
@@ -55,11 +61,14 @@ public class UserController {
 	
 	@ApiOperation(value = "Sign Up")
 	@PostMapping("/signup")
-	public ResponseEntity<SessionDTO> signUp(@ApiParam(name="user", required=true, value="user") @Valid @RequestBody SignupRequestDTO signupRequest){
+	public ResponseEntity<SessionDTO> signUp(@ApiParam(name="user", required=true, value="user") @Valid @RequestBody SignupRequestDTO signupRequest,HttpServletRequest request){
 		log.debug("signUp(..)");
 		log.debug("signupRequest: {}",ObjectUtils.toJson(signupRequest));
-		SessionDTO userSession = userService.signUp(signupRequest);
+		User user = userService.signUp(signupRequest);
+		
+		SessionDTO userSession = authenticationService.authenticate(user, request);
 		log.debug("userSession: {}",ObjectUtils.toJson(userSession));
+		
 		return new ResponseEntity<>(userSession, HttpStatus.OK);
 	}
 	
@@ -74,7 +83,7 @@ public class UserController {
 	
 	@ApiOperation(value = "Login")
 	@PostMapping("/login")
-	public ResponseEntity<SessionDTO> login(@ApiParam(name="authorization", required=true, value="Base64 username and password encoded token") @RequestHeader("authorization") String authorization){
+	public ResponseEntity<SessionDTO> login(@ApiParam(name="authorization", required=true, value="authorization") @Valid @RequestBody LoginRequestDTO loginRequestDTO){
 		log.info("login(...)");
 		return new ResponseEntity<>(new SessionDTO(), HttpStatus.OK);
 	}

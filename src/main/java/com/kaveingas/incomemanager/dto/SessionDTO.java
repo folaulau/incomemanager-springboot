@@ -13,7 +13,9 @@ public class SessionDTO {
 	private String token;
 	private String email;
 	private String userUuid;
+	private String accountUuid;
 	private String name;
+	private String profileSetupStatus;
 
 	public SessionDTO() {
 		super();
@@ -44,12 +46,28 @@ public class SessionDTO {
 		this.userUuid = userUuid;
 	}
 
+	public String getAccountUuid() {
+		return accountUuid;
+	}
+
+	public void setAccountUuid(String accountUuid) {
+		this.accountUuid = accountUuid;
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getProfileSetupStatus() {
+		return profileSetupStatus;
+	}
+
+	public void setProfileSetupStatus(String profileSetupStatus) {
+		this.profileSetupStatus = profileSetupStatus;
 	}
 
 	@Override

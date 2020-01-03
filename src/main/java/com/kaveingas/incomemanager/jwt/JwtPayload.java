@@ -11,30 +11,37 @@ import com.kaveingas.incomemanager.user.User;
 import com.kaveingas.incomemanager.utils.ObjectUtils;
 
 /**
- * https://tools.ietf.org/html/rfc7519
- * JWT Payload
+ * https://tools.ietf.org/html/rfc7519 JWT Payload
  * 
  */
 @JsonInclude(value = Include.NON_NULL)
 public class JwtPayload implements Serializable {
 
 	private static final long serialVersionUID = -1L;
-	
+
 	// issuer
 	private String iss;
 	// id of jwt
 	private String jti;
-	
+
 	private String email;
-	
-	private String uid;
-	
+
+	// user uuid
+	private String uuid;
+
+	// user id
+	private Long uid;
+
+	private String acctUuid;
+
+	private Long acctId;
+
 	private Long id;
-	
+
 	private String deviceId;
-	
+
 	private List<String> authorities;
-	
+
 	// issued at
 	private Date iat;
 	// expired at
@@ -45,26 +52,30 @@ public class JwtPayload implements Serializable {
 	public JwtPayload() {
 		this(null);
 	}
-	
+
 	public JwtPayload(String jti) {
-		this(null,jti,null,null,null,null,null,null,null);
-	}
-	
-	public JwtPayload(User user, String jti) {
-		this(null,jti,user.getEmail(),user.getUuid(),user.getAuthorities(),null,null,null,null);
+		this(null, jti, null, null, null, null, null, null, null, null, null, null);
 	}
 
-	public JwtPayload(String iss, String jti, String email, String uid, List<String> authorities, String deviceId, Date iat,
-			Date exp, Date nbf) {
+	public JwtPayload(User user, String jti) {
+		this(null, jti, user.getEmail(), user.getId(), user.getUuid(), user.getAuthorities(), null,
+				user.getAccount().getUuid(), user.getAccount().getId(), null, null, null);
+	}
+
+	public JwtPayload(String iss, String jti, String email, Long uid, String uuid, List<String> authorities,
+			String deviceId, String acctUuid, Long acctId, Date iat, Date exp, Date nbf) {
 		super();
 		this.iss = iss;
 		this.jti = jti;
 		this.email = email;
-		this.uid = uid;
+		this.uuid = uuid;
 		this.authorities = authorities;
 		this.iat = iat;
 		this.exp = exp;
 		this.nbf = nbf;
+		this.acctUuid = acctUuid;
+		this.acctId = acctId;
+		this.uid = uid;
 	}
 
 	public String getIss() {
@@ -74,7 +85,7 @@ public class JwtPayload implements Serializable {
 	public void setIss(String iss) {
 		this.iss = iss;
 	}
-	
+
 	public String getJti() {
 		return jti;
 	}
@@ -115,16 +126,24 @@ public class JwtPayload implements Serializable {
 		this.email = email;
 	}
 
-	public String getUid() {
-		return uid;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setUid(String uid) {
-		this.uid = uid;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public Long getId() {
 		return id;
+	}
+
+	public Long getUid() {
+		return uid;
+	}
+
+	public void setUid(Long uid) {
+		this.uid = uid;
 	}
 
 	public void setId(Long id) {
@@ -147,14 +166,30 @@ public class JwtPayload implements Serializable {
 		this.deviceId = deviceId;
 	}
 
-	public String toJson() {
-        try {
-            return ObjectUtils.getObjectMapper().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            System.out.println("JwtPayload - toJson - JsonProcessingException, msg: " + e.getLocalizedMessage());
-            return "{}";
-        }
+	public String getAcctUuid() {
+		return acctUuid;
 	}
-	
-}
 
+	public void setAcctUuid(String acctUuid) {
+		this.acctUuid = acctUuid;
+	}
+
+	public Long getAcctId() {
+		return acctId;
+	}
+
+	public void setAcctId(Long acctId) {
+		this.acctId = acctId;
+	}
+
+	public String toJson() {
+		try {
+			return ObjectUtils.getObjectMapper().writeValueAsString(this);
+		} catch (JsonProcessingException e) {
+			System.out.println(
+					"JwtPayload - JwtPayload - toJson - JsonProcessingException, msg: " + e.getLocalizedMessage());
+			return "{}";
+		}
+	}
+
+}

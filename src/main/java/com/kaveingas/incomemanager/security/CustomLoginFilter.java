@@ -6,6 +6,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -29,83 +30,95 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.kaveingas.incomemanager.dto.LoginRequestDTO;
 import com.kaveingas.incomemanager.dto.SessionDTO;
 import com.kaveingas.incomemanager.jwt.JwtPayload;
 import com.kaveingas.incomemanager.jwt.JwtTokenUtils;
+import com.kaveingas.incomemanager.security.auth.AuthenticationService;
 import com.kaveingas.incomemanager.user.User;
 import com.kaveingas.incomemanager.user.UserService;
 import com.kaveingas.incomemanager.utils.HttpUtils;
 import com.kaveingas.incomemanager.utils.ObjectUtils;
 import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
 
-
-
 /**
  * CustomUsernamePassworAuthenticationFilter
+ * 
  * @author fkaveinga
  *
  */
 public class CustomLoginFilter extends AbstractAuthenticationProcessingFilter {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
-	
-	private Map<String,String> authenticationDetails = new HashMap<>();
+
+	private Map<String, String> authenticationDetails = new HashMap<>();
 
 	@Autowired
 	private UserService userService;
 	
+	@Autowired
+	private AuthenticationService authenticationService;
+
 	public CustomLoginFilter(String loginUrl, AuthenticationManager authManager) {
 		super(new AntPathRequestMatcher(loginUrl));
 		setAuthenticationManager(authManager);
 	}
 
-	
 	/**
-	 * Attemp Authentication process. Pass username and password to authentication provider
+	 * Attemp Authentication process. Pass username and password to authentication
+	 * provider
+	 * 
 	 * @author fkaveinga
 	 * @return Authentication
 	 */
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException, IOException, ServletException {
-		
+
 		String authorizationHeader = request.getHeader("authorization");
-		log.info("Login Authorization Header: {}",authorizationHeader);
+		log.info("Login Authorization Header: {}", authorizationHeader);
+
+		String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+
+		log.info("body: {}", body);
 		
-		if(authorizationHeader==null) {
-			throw new InsufficientAuthenticationException("Authorization Header is null");
+		LoginRequestDTO loginRequestDTO = LoginRequestDTO.fromJson(body);
+
+		if (loginRequestDTO == null) {
+			throw new InsufficientAuthenticationException("Email or password is null");
 		}
-		
-		String email = getUsername(authorizationHeader);
-		String password = getPassword(authorizationHeader);
-		log.debug("email: {}",email);
-		log.debug("password: {}",password);
-		
-		if(email == null || email.isEmpty()) {
+
+		String email = loginRequestDTO.getEmail();
+		String password = loginRequestDTO.getPassword();
+		log.debug("email: {}", email);
+		log.debug("password: {}", password);
+
+		if (email == null || email.isEmpty()) {
 			log.info("username is null");
 			throw new InsufficientAuthenticationException("Username is null");
 		}
-		
-		if(password == null || password.isEmpty()) {
+
+		if (password == null || password.isEmpty()) {
 			log.info("password is null");
 			throw new InsufficientAuthenticationException("Password is null");
 		}
-		
+
 		authenticationDetails.put("test", "good");
-		
+
 		return authenticateWithPassword(email, password);
-		
+
 	}
-	
+
 	private Authentication authenticateWithPassword(String email, String password) {
-		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+				email, password);
 		usernamePasswordAuthenticationToken.setDetails(authenticationDetails);
 		return getAuthenticationManager().authenticate(usernamePasswordAuthenticationToken);
 	}
-	
 
 	/**
 	 * Write response when request was successful.
+	 * 
 	 * @author fkaveinga
 	 * @return HttpServletResponse
 	 */
@@ -116,28 +129,25 @@ public class CustomLoginFilter extends AbstractAuthenticationProcessingFilter {
 		String clientIpAddress = HttpUtils.getRequestIP(request);
 		String clientUserAgent = HttpUtils.getRequestUserAgent(request);
 		
-		String email = authResult.getPrincipal().toString();
+		//log.info("authResult.getDetails={}",authResult.getDetails().toString());
 		
-		User user = this.userService.getByEmail(email);
+		User user = (User)authResult.getDetails();
 		
-		JwtPayload jwtpayload = new JwtPayload(user, RandomGeneratorUtils.getJwtUuid());
-		jwtpayload.setDeviceId(clientUserAgent);
+		//log.info("user={}",ObjectUtils.toJson(user));
+
+		SessionDTO sessionDto = authenticationService.authenticate(user, request);
 		
-		String jwtToken = JwtTokenUtils.generateToken(jwtpayload);
-		
-		SessionDTO sessionDto = new SessionDTO();
-		sessionDto.setEmail(email);
-		sessionDto.setUserUuid(user.getUuid());
-		sessionDto.setToken(jwtToken);
-		
+		//log.info("sessionDto={}",ObjectUtils.toJson(sessionDto));
+
 		response.setStatus(HttpStatus.OK.value());
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-		
-		ObjectUtils.getObjectMapper().writeValue(response.getWriter(),sessionDto);
+
+		ObjectUtils.getObjectMapper().writeValue(response.getWriter(), sessionDto);
 	}
 
 	/**
 	 * Write response when request was unsuccessful.
+	 * 
 	 * @author fkaveinga
 	 * @return HttpServletResponse
 	 */
@@ -145,24 +155,25 @@ public class CustomLoginFilter extends AbstractAuthenticationProcessingFilter {
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException failed) throws IOException, ServletException {
 		log.debug("unsuccessfulAuthentication(...)");
-		
+
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		response.setStatus(HttpStatus.BAD_REQUEST.value());
-		
+
 		String message = failed.getLocalizedMessage();
-		log.debug("Error message: {}",message);
+		log.debug("Error message: {}", message);
 
 		response.setStatus(HttpStatus.BAD_REQUEST.value());
-		
+
 		ObjectNode result = ObjectUtils.getObjectNode();
-		
+
 		result.put("status", "invalid email or password");
-		
+
 		ObjectUtils.getObjectMapper().writeValue(response.getWriter(), result);
 	}
-	
+
 	/**
 	 * Parse token for username
+	 * 
 	 * @param authorizationHeader
 	 * @return String username
 	 */
@@ -171,20 +182,21 @@ public class CustomLoginFilter extends AbstractAuthenticationProcessingFilter {
 		String username = null;
 		try {
 			String usernamePasswordToken = StringUtils.substringAfter(authorizationHeader, " ").trim();
-			//log.info("usernamePasswordToken: {}",usernamePasswordToken);
+			// log.info("usernamePasswordToken: {}",usernamePasswordToken);
 			String rawToken = this.decodeBase64Token(usernamePasswordToken);
-			log.debug("rawToken: {}",rawToken);
-			username  = StringUtils.substringBefore(rawToken, ":");
-			log.debug("username: {}",username);
+			log.debug("rawToken: {}", rawToken);
+			username = StringUtils.substringBefore(rawToken, ":");
+			log.debug("username: {}", username);
 			return username;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return username;
 	}
-	
+
 	/**
 	 * Parse token for password
+	 * 
 	 * @param authorizationHeader
 	 * @return String password
 	 */
@@ -195,20 +207,21 @@ public class CustomLoginFilter extends AbstractAuthenticationProcessingFilter {
 			String usernamePasswordToken = StringUtils.substringAfter(authorizationHeader, " ").trim();
 
 			String rawToken = this.decodeBase64Token(usernamePasswordToken);
-			log.debug("rawToken: {}",rawToken);
-			password  = StringUtils.substringAfter(rawToken, ":");
-			log.debug("username: {}",password);
+			log.debug("rawToken: {}", rawToken);
+			password = StringUtils.substringAfter(rawToken, ":");
+			log.debug("username: {}", password);
 			return password;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return password;
-		
+
 	}
-	
+
 	/**
 	 * Parse for access token
+	 * 
 	 * @param authorizationHeader
 	 * @return String access token
 	 */
@@ -217,16 +230,16 @@ public class CustomLoginFilter extends AbstractAuthenticationProcessingFilter {
 		String bearerToken = null;
 		try {
 			bearerToken = StringUtils.substringAfter(authorizationHeader, " ").trim();
-			log.info("bearerToken: {}",bearerToken);
+			log.info("bearerToken: {}", bearerToken);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return bearerToken;
 	}
-	
-	
+
 	/**
 	 * Decode authentication token
+	 * 
 	 * @param usernamePasswordToken
 	 * @return String
 	 */

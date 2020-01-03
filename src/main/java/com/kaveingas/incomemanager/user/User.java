@@ -1,5 +1,6 @@
 package com.kaveingas.incomemanager.user;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,8 +35,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kaveingas.incomemanager.account.Account;
 import com.kaveingas.incomemanager.address.Address;
+import com.kaveingas.incomemanager.dto.LoginRequestDTO;
 import com.kaveingas.incomemanager.role.Role;
 import com.kaveingas.incomemanager.utils.ApiSessionUtils;
+import com.kaveingas.incomemanager.utils.ObjectUtils;
 import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
 
 @JsonInclude(value = Include.NON_NULL)
@@ -91,6 +94,11 @@ public class User implements Serializable {
 	public User() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+	
+	public User(Long id) {
+		super();
+		this.setId(id);
 	}
 
 	public Long getId() {
@@ -203,6 +211,16 @@ public class User implements Serializable {
 
 	public void setAccount(Account account) {
 		this.account = account;
+	}
+	
+	public static User fromJson(String json) {
+		try {
+			return ObjectUtils.getObjectMapper().readValue(json, User.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("User - JsonProcessingException, msg: " + e.getLocalizedMessage());
+			return null;
+		}
 	}
 
 	@Override

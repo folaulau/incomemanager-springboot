@@ -3,12 +3,15 @@ package com.kaveingas.incomemanager.income;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -24,14 +27,16 @@ import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.kaveingas.incomemanager.account.Account;
 import com.kaveingas.incomemanager.spending.SpendingItem;
+import com.kaveingas.incomemanager.user.User;
 import com.kaveingas.incomemanager.utils.ApiSessionUtils;
 import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
 
 @JsonInclude(value = Include.NON_NULL)
 @Entity
 @Where(clause = "deleted = 'F'")
-@Table(name = "income", indexes = { @Index(columnList = "uuid") })
+@Table(name = "income", indexes = { @Index(columnList = "uuid") , @Index(columnList = "user_id") })
 public class Income implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -53,6 +58,10 @@ public class Income implements Serializable {
 
 	@Column(name = "paycheck_net_amount")
 	private double paycheckNetAmount;
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
 	@Type(type = "true_false")
 	@Column(name = "deleted", columnDefinition = "char(1) default 'F'")
@@ -179,6 +188,14 @@ public class Income implements Serializable {
 		this.paycheckNetAmount = paycheckNetAmount;
 	}
 
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
@@ -212,6 +229,7 @@ public class Income implements Serializable {
 
 		if (currentUserId > 0) {
 			this.createdBy = currentUserId;
+
 		}
 	}
 

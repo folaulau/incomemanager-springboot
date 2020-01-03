@@ -15,5 +15,5 @@ public interface UserService {
 	
 	User getByEmail(String email);
 
-	SessionDTO signUp(SignupRequestDTO signupRequest);
+	User signUp(SignupRequestDTO signupRequest);
 }

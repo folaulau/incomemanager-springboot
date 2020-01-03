@@ -42,6 +42,9 @@ public class Account implements Serializable {
 	@Column(name = "uuid", updatable = false, nullable = false, unique = true)
 	private String uuid;
 
+	@Column(name = "profile_setup_status")
+	private String profileSetupStatus;
+
 	@Type(type = "true_false")
 	@Column(name = "deleted", columnDefinition = "char(1) default 'F'")
 	private boolean deleted;
@@ -141,6 +144,14 @@ public class Account implements Serializable {
 
 	public void setUpdatedBy(Long updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+
+	public String getProfileSetupStatus() {
+		return profileSetupStatus;
+	}
+
+	public void setProfileSetupStatus(String profileSetupStatus) {
+		this.profileSetupStatus = profileSetupStatus;
 	}
 
 	@Override
