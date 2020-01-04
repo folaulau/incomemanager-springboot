@@ -3,6 +3,7 @@ package com.kaveingas.incomemanager.user;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -56,21 +57,43 @@ public class User implements Serializable {
 
 	@Column(name = "uuid", unique = true, nullable = false, updatable = false)
 	private String uuid;
-	
-	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "account_id")
-	private Account account;
 
 	@Column(name = "email", nullable = false, unique = true)
 	private String email;
 
+	@Column(name = "first_name")
+	private String firstName;
+
+	@Column(name = "last_name")
+	private String lastName;
+
+	@Column(name = "gender")
+	private String gender;
+
+	@Column(name = "date_of_birth")
+	private Date dateOfBirth;
+
+	@Column(name = "marital_status")
+	private String maritalStatus;
+
 	@Column(name = "password", nullable = false)
 	private String password;
 
-	@JsonIgnoreProperties(value = { "user" })
-	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name = "address_id")
-	private Address address;
+	@Type(type = "true_false")
+	@Column(name = "primary_user", nullable = false, columnDefinition = "char(1) default 'F'")
+	private boolean primary;
+
+	// primary, spouse, parent, dependent
+	@Column(name = "relationToPrimary")
+	private String relationToPrimary;
+
+	@Type(type = "true_false")
+	@Column(name = "active_user", nullable = false, updatable = true, columnDefinition = "char(1) default 'F'")
+	private Boolean active;
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "account_id")
+	private Account account;
 
 	@JsonIgnoreProperties(value = { "users" })
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -86,7 +109,7 @@ public class User implements Serializable {
 
 	@Column(name = "deleted_by")
 	private Long deletedBy;
-	
+
 	@Type(type = "true_false")
 	@Column(name = "deleted", nullable = false)
 	private boolean deleted;
@@ -95,7 +118,31 @@ public class User implements Serializable {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getRelationToPrimary() {
+		return relationToPrimary;
+	}
+
+	public void setRelationToPrimary(String relationToPrimary) {
+		this.relationToPrimary = relationToPrimary;
+	}
+
 	public User(Long id) {
 		super();
 		this.setId(id);
@@ -116,8 +163,6 @@ public class User implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
-	
 
 	public String getUuid() {
 		return uuid;
@@ -142,14 +187,6 @@ public class User implements Serializable {
 		this.roles.add(role);
 	}
 
-	public Address getAddress() {
-		return address;
-	}
-
-	public void setAddress(Address address) {
-		this.address = address;
-	}
-
 	public String getPassword() {
 		return password;
 	}
@@ -164,6 +201,38 @@ public class User implements Serializable {
 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public Date getDateOfBirth() {
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(Date dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
+
+	public String getMaritalStatus() {
+		return maritalStatus;
+	}
+
+	public void setMaritalStatus(String maritalStatus) {
+		this.maritalStatus = maritalStatus;
+	}
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
 	public List<String> getAuthorities() {
@@ -202,8 +271,6 @@ public class User implements Serializable {
 	public void setDeletedBy(Long deletedBy) {
 		this.deletedBy = deletedBy;
 	}
-	
-	
 
 	public Account getAccount() {
 		return account;
@@ -212,7 +279,15 @@ public class User implements Serializable {
 	public void setAccount(Account account) {
 		this.account = account;
 	}
-	
+
+	public boolean isPrimary() {
+		return primary;
+	}
+
+	public void setPrimary(boolean primary) {
+		this.primary = primary;
+	}
+
 	public static User fromJson(String json) {
 		try {
 			return ObjectUtils.getObjectMapper().readValue(json, User.class);
@@ -247,8 +322,8 @@ public class User implements Serializable {
 			return false;
 		}
 		User other = (User) obj;
-		return new EqualsBuilder().append(this.id, other.id).append(this.email, other.email).append(this.uuid, other.uuid)
-				.isEquals();
+		return new EqualsBuilder().append(this.id, other.id).append(this.email, other.email)
+				.append(this.uuid, other.uuid).isEquals();
 	}
 
 	@PrePersist
@@ -261,11 +336,11 @@ public class User implements Serializable {
 	@PreUpdate
 	private void preUpdate() {
 		this.updatedBy = ApiSessionUtils.getCreateBy();
-		
-		if(this.isDeleted()) {
+
+		if (this.isDeleted()) {
 			this.deletedBy = this.updatedBy;
 		}
-		
+
 	}
 
 }

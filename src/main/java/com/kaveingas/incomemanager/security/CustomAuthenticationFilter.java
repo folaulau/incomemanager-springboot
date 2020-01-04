@@ -32,6 +32,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kaveingas.incomemanager.jwt.JwtPayload;
 import com.kaveingas.incomemanager.jwt.JwtTokenUtils;
+import com.kaveingas.incomemanager.utils.HttpUtils;
 import com.kaveingas.incomemanager.utils.ObjectUtils;
 
 public class CustomAuthenticationFilter extends OncePerRequestFilter {
@@ -53,7 +54,8 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		log.debug("doFilterInternal(...)");
 		String token = request.getHeader("token");
-		log.info("Token: {}", token);
+		//log.debug("Token: {}", token);
+		//log.debug("url: {}", HttpUtils.getFullURL(request));
 
 		if (token == null) {
 			ObjectNode erroMsg = ObjectUtils.getObjectNode();
@@ -79,7 +81,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		log.info("valid request, jwtPayload: {}", ObjectUtils.toJson(jwtPayload));
+		//log.info("valid request, jwtPayload: {}", ObjectUtils.toJson(jwtPayload));
 
 		setRequestSecurityAuthentication(jwtPayload);
 
@@ -96,6 +98,6 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		SecurityContextHolder.getContext().setAuthentication(
-				new UsernamePasswordAuthenticationToken(jwtPayload, jwtPayload.getUuid(), authorities));
+				new UsernamePasswordAuthenticationToken(jwtPayload, jwtPayload.getUserUuid(), authorities));
 	}
 }

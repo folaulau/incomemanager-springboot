@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kaveingas.incomemanager.dto.SessionDTO;
 import com.kaveingas.incomemanager.dto.SignupRequestDTO;
 import com.kaveingas.incomemanager.dto.UserDTO;
+import com.kaveingas.incomemanager.dto.UserProfileDTO;
+import com.kaveingas.incomemanager.dto.UserProfileUpdateDTO;
+import com.kaveingas.incomemanager.dto.AccountStatsDTO;
 import com.kaveingas.incomemanager.dto.EntityDTOMapper;
 import com.kaveingas.incomemanager.dto.LoginRequestDTO;
 import com.kaveingas.incomemanager.role.Role;
@@ -70,6 +74,41 @@ public class UserController {
 		log.debug("userSession: {}",ObjectUtils.toJson(userSession));
 		
 		return new ResponseEntity<>(userSession, HttpStatus.OK);
+	}
+	
+	
+	@ApiOperation(value = "Update Profile")
+	@PutMapping("/profile")
+	public ResponseEntity<UserProfileDTO> update(@RequestHeader("token") String token, @ApiParam(name="user", required=true, value="user") @Valid @RequestBody UserProfileUpdateDTO userProfileUpdateDTO){
+		log.debug("update(..)");
+		log.debug("userProfileUpdateDTO: {}",ObjectUtils.toJson(userProfileUpdateDTO));
+		
+		UserProfileDTO userProfileDTO = userService.updateProfile(userProfileUpdateDTO);
+		
+		return new ResponseEntity<>(userProfileDTO, HttpStatus.OK);
+	}
+	
+	
+	@ApiOperation(value = "Get Profile")
+	@GetMapping("/profile")
+	public ResponseEntity<UserProfileDTO> getProfile(@RequestHeader("token") String token, @ApiParam(name="uuid", required=true, value="uuid") @RequestParam String uuid){
+		log.debug("getProfile(..)");
+		log.debug("uuid: {}", uuid);
+		
+		UserProfileDTO userProfileDTO = userService.getProfile(uuid);
+		
+		return new ResponseEntity<>(userProfileDTO, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "Get Stats")
+	@GetMapping("/account/stats")
+	public ResponseEntity<AccountStatsDTO> getStats(@RequestHeader("token") String token, @ApiParam(name="accountUuid", required=true, value="accountUuid") @RequestParam String accountUuid){
+		log.debug("getStats(..)");
+		log.debug("accountUuid: {}", accountUuid);
+		
+		AccountStatsDTO accountStatsDTO = userService.getStats(accountUuid);
+		
+		return new ResponseEntity<>(accountStatsDTO, HttpStatus.OK);
 	}
 	
 	/**

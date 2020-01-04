@@ -36,11 +36,14 @@ public final class JwtTokenUtils {
 	public static String generateToken(JwtPayload payload) {
 		log.debug("JwtTokenUtils - generate(..)");
 		try {
-			String token = JWT.create().withClaim("email", payload.getEmail()).withClaim("uuid", payload.getUuid())
-					.withClaim("uid", payload.getUid())
-					.withClaim("id", payload.getId()).withClaim("deviceId", payload.getDeviceId())
+			String token = JWT.create()
+					.withClaim("email", payload.getEmail())
+					.withClaim("userUuid", payload.getUserUuid())
+					.withClaim("userId", payload.getUserId())
+					.withClaim("deviceId", payload.getDeviceId())
 					.withClaim("acctUuid", payload.getAcctUuid())
 					.withClaim("acctId", payload.getAcctId())
+					.withClaim("primary", payload.getPrimary())
 					.withArrayClaim("roles",
 							payload.getAuthorities().toArray(new String[payload.getAuthorities().size()]))
 					.withIssuedAt(new Date()).withJWTId(payload.getJti()).withIssuer(ISSUER)
@@ -92,21 +95,21 @@ public final class JwtTokenUtils {
 
 		String email = jwt.getClaim("email").asString();
 		jwtPayload.setEmail(email);
-		
-		String uuid = jwt.getClaim("uuid").asString();
-		jwtPayload.setUuid(uuid);
-		
+
+		String userUuid = jwt.getClaim("userUuid").asString();
+		jwtPayload.setUserUuid(userUuid);
+
 		String acctUuid = jwt.getClaim("acctUuid").asString();
 		jwtPayload.setAcctUuid(acctUuid);
-		
+
 		Long acctId = jwt.getClaim("acctId").asLong();
 		jwtPayload.setAcctId(acctId);
 
-		Long id = jwt.getClaim("id").asLong();
-		jwtPayload.setId(id);
+		Long userId = jwt.getClaim("userId").asLong();
+		jwtPayload.setUserId(userId);
 		
-		Long uid = jwt.getClaim("uid").asLong();
-		jwtPayload.setUid(uid);
+		Boolean primary = jwt.getClaim("primary").asBoolean();
+		jwtPayload.setPrimary(primary);
 
 		String deviceId = jwt.getClaim("deviceId").asString();
 		jwtPayload.setDeviceId(deviceId);

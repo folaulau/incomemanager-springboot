@@ -27,20 +27,20 @@ public class JwtPayload implements Serializable {
 	private String email;
 
 	// user uuid
-	private String uuid;
+	private String userUuid;
 
 	// user id
-	private Long uid;
+	private Long userId;
 
 	private String acctUuid;
 
 	private Long acctId;
 
-	private Long id;
-
 	private String deviceId;
 
 	private List<String> authorities;
+
+	private Boolean primary;
 
 	// issued at
 	private Date iat;
@@ -54,28 +54,29 @@ public class JwtPayload implements Serializable {
 	}
 
 	public JwtPayload(String jti) {
-		this(null, jti, null, null, null, null, null, null, null, null, null, null);
+		this(null, jti, null, null, null, null, null, null, null, null, null, null, null);
 	}
 
 	public JwtPayload(User user, String jti) {
 		this(null, jti, user.getEmail(), user.getId(), user.getUuid(), user.getAuthorities(), null,
-				user.getAccount().getUuid(), user.getAccount().getId(), null, null, null);
+				user.getAccount().getUuid(), user.getAccount().getId(), user.isPrimary(), null, null, null);
 	}
 
-	public JwtPayload(String iss, String jti, String email, Long uid, String uuid, List<String> authorities,
-			String deviceId, String acctUuid, Long acctId, Date iat, Date exp, Date nbf) {
+	public JwtPayload(String iss, String jti, String email, Long userId, String userUuid, List<String> authorities,
+			String deviceId, String acctUuid, Long acctId, Boolean primary, Date iat, Date exp, Date nbf) {
 		super();
 		this.iss = iss;
 		this.jti = jti;
 		this.email = email;
-		this.uuid = uuid;
+		this.userUuid = userUuid;
 		this.authorities = authorities;
 		this.iat = iat;
 		this.exp = exp;
 		this.nbf = nbf;
 		this.acctUuid = acctUuid;
 		this.acctId = acctId;
-		this.uid = uid;
+		this.userId = userId;
+		this.primary = primary;
 	}
 
 	public String getIss() {
@@ -92,6 +93,14 @@ public class JwtPayload implements Serializable {
 
 	public void setJti(String jti) {
 		this.jti = jti;
+	}
+
+	public Boolean getPrimary() {
+		return primary;
+	}
+
+	public void setPrimary(Boolean primary) {
+		this.primary = primary;
 	}
 
 	public Date getIat() {
@@ -126,28 +135,20 @@ public class JwtPayload implements Serializable {
 		this.email = email;
 	}
 
-	public String getUuid() {
-		return uuid;
+	public String getUserUuid() {
+		return userUuid;
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
 	}
 
-	public Long getId() {
-		return id;
+	public Long getUserId() {
+		return userId;
 	}
 
-	public Long getUid() {
-		return uid;
-	}
-
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 
 	public List<String> getAuthorities() {

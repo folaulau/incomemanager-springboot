@@ -37,6 +37,11 @@ public class AuthenticationServiceImp implements AuthenticationService {
 		ssnDto.setEmail(user.getEmail());
 		ssnDto.setUserUuid(user.getUuid());
 		ssnDto.setToken(jwtToken);
+		ssnDto.setPrimary(user.isPrimary());
+		ssnDto.setAccountUuid(user.getAccount().getUuid());
+		ssnDto.setProfileSetupStatus(user.getAccount().getProfileSetupStatus());
+		ssnDto.setFirstName(user.getFirstName());
+		ssnDto.setLastName(user.getLastName());
 		
 		return ssnDto;
 	}

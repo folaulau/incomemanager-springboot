@@ -38,40 +38,39 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
-@Api(value = "incomes",produces = "Rest API for income operations", tags = "Income Controller")
+@Api(value = "incomes", produces = "Rest API for income operations", tags = "Income Controller")
 @RestController
 @RequestMapping("/incomes")
 public class IncomeController {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired
 	private IncomeService incomeService;
-	
-	
+
 	@Autowired
 	private EntityDTOMapper entityDTOMapper;
-	
+
 	@Autowired
 	private AuthenticationService authenticationService;
-	
+
 	/**
 	 * 
 	 * @param apiKey
 	 * @param user
 	 * @return
 	 */
-	
-	@ApiOperation(value = "Add income")
+
+	@ApiOperation(value = "Add incomes")
 	@PostMapping
-	public ResponseEntity<List<Income>> save(@ApiParam(name="income", required=true, value="income") @Valid @RequestBody List<Income> incomes){
+	public ResponseEntity<List<Income>> save(@RequestHeader("token") String token,
+			@ApiParam(name = "incomes", required = true, value = "incomes") @Valid @RequestBody List<Income> incomes) {
 		log.debug("add(..)");
-		log.debug("incomes: {}",ObjectUtils.toJson(incomes));
-		
+		log.debug("incomes: {}", ObjectUtils.toJson(incomes));
+
 		List<Income> savedIncomes = incomeService.save(incomes);
-		
+
 		return new ResponseEntity<>(savedIncomes, HttpStatus.OK);
 	}
-	
-	
+
 }

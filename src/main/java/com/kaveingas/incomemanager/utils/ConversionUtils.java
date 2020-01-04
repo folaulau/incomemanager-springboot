@@ -3,6 +3,9 @@ package com.kaveingas.incomemanager.utils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -85,5 +88,33 @@ public final class ConversionUtils {
 			//System.out.println("IOException, msg: "+e.getLocalizedMessage());
 		}
 		return null;
+	}
+	
+	public static BigDecimal getStrTwoDecimalPlaces(String value) {
+		return new BigDecimal(value).setScale(2, RoundingMode.HALF_EVEN);
+	}
+	
+	// Get Two Decimal Double
+	public static Double getTwoDecimalPlaces(Double value) {
+		return new BigDecimal(value).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+	}
+	
+	public static Double getTwoDecimalPlaces(Long value) {
+		return new BigDecimal(value).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+	}
+	
+	public static String getTwoDecimalPlacesAsString(Double value) {
+		double amount = new BigDecimal(value).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+		DecimalFormat df = new DecimalFormat("#0.00");
+		return df.format(amount);
+	}
+	
+	public static String formatDollarAmountWithTwoDecimalAsString(double amount) {
+		DecimalFormat df = new DecimalFormat("#0.00");
+		return df.format(amount);
+	}
+	
+	public static Float getTwoDecimalPlacesAsFloat(Double value) {
+		return new BigDecimal(value).setScale(2, RoundingMode.HALF_EVEN).floatValue();
 	}
 }

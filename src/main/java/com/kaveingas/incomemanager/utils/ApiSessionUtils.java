@@ -17,6 +17,23 @@ public class ApiSessionUtils {
 
 	static Logger log = LoggerFactory.getLogger(ApiSessionUtils.class);
 
+	/**
+	 * set jwtPayload in UsernamePasswordAuthenticationToken principal
+	 * 
+	 * @param jwtPayload
+	 */
+	public static void setRequestSecurityAuthentication(JwtPayload jwtPayload) {
+		List<GrantedAuthority> authorities = new ArrayList<>();
+		if (jwtPayload.getAuthorities() != null || jwtPayload.getAuthorities().isEmpty() == false) {
+			for (String role : jwtPayload.getAuthorities()) {
+				authorities.add(new SimpleGrantedAuthority(role.toUpperCase()));
+			}
+		}
+
+		SecurityContextHolder.getContext().setAuthentication(
+				new UsernamePasswordAuthenticationToken(jwtPayload, jwtPayload.getUserUuid(), authorities));
+	}
+
 	public static JwtPayload getApiSession() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null) {
@@ -28,7 +45,7 @@ public class ApiSessionUtils {
 		return null;
 	}
 
-	public static Long getApiSessionUserId() {
+	public static Long getCurrentUserId() {
 
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -36,8 +53,8 @@ public class ApiSessionUtils {
 			if (auth != null) {
 				JwtPayload session = (JwtPayload) auth.getPrincipal();
 
-				if (session != null && session.getUid() != null) {
-					return session.getUid();
+				if (session != null && session.getUserId() != null) {
+					return session.getUserId();
 				}
 
 			}
@@ -48,7 +65,7 @@ public class ApiSessionUtils {
 		return new Long(0);
 	}
 
-	public static Long getApiSessionAccountId() {
+	public static Long getCurrentUserAccountId() {
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (auth != null) {
@@ -68,33 +85,26 @@ public class ApiSessionUtils {
 	}
 
 	public static Long getCreateBy() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null) {
-			JwtPayload session = (JwtPayload) auth.getPrincipal();
-
-			if (session != null && session.getId() != null) {
-				return session.getId();
-			}
-
-		}
-		return new Long(1);
+		return getCurrentUserId();
 	}
 
-	/**
-	 * set jwtPayload in UsernamePasswordAuthenticationToken principal
-	 * 
-	 * @param jwtPayload
-	 */
-	public static void setRequestSecurityAuthentication(JwtPayload jwtPayload) {
-		List<GrantedAuthority> authorities = new ArrayList<>();
-		if (jwtPayload.getAuthorities() != null || jwtPayload.getAuthorities().isEmpty() == false) {
-			for (String role : jwtPayload.getAuthorities()) {
-				authorities.add(new SimpleGrantedAuthority(role.toUpperCase()));
+	public static boolean isCurrentUserPrimary() {
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth != null) {
+				JwtPayload session = (JwtPayload) auth.getPrincipal();
+
+				if (session != null && session.getPrimary()!=null) {
+					return session.getPrimary();
+				}
+
 			}
+		} catch (Exception e) {
+			log.warn(e.getLocalizedMessage());
+
 		}
 
-		SecurityContextHolder.getContext().setAuthentication(
-				new UsernamePasswordAuthenticationToken(jwtPayload, jwtPayload.getUuid(), authorities));
+		return false;
 	}
 
 }

@@ -3,13 +3,16 @@ package com.kaveingas.incomemanager.expense;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -25,7 +28,8 @@ import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.kaveingas.incomemanager.spending.SpendingItem;
+import com.kaveingas.incomemanager.spending.Spending;
+import com.kaveingas.incomemanager.user.User;
 import com.kaveingas.incomemanager.utils.ApiSessionUtils;
 import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
 
@@ -35,7 +39,7 @@ import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
 @JsonInclude(value = Include.NON_NULL)
 @Entity
 @Where(clause = "deleted = 'F'")
-@Table(name = "expense", indexes = { @Index(columnList = "uuid") })
+@Table(name = "expense", indexes = { @Index(columnList = "uuid"), @Index(columnList = "user_id"), @Index(columnList = "amount") })
 public class Expense implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -48,17 +52,15 @@ public class Expense implements Serializable {
 	@Column(name = "uuid", updatable = false, nullable = false, unique = true)
 	private String uuid;
 
-	@Column(name = "user_id", nullable = false)
-	private Long userId;
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
-	@Column(name = "title")
-	private String title;
+	@Column(name = "name")
+	private String name;
 
 	@Column(name = "type")
 	private String type;
-
-	@Column(name = "confirmation_code")
-	private String confirmationCode;
 
 	@Column(name = "took_place_at")
 	private Date date;
@@ -114,20 +116,12 @@ public class Expense implements Serializable {
 		this.uuid = uuid;
 	}
 
-	public Long getUserId() {
-		return userId;
+	public User getUser() {
+		return user;
 	}
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public String getType() {
@@ -136,14 +130,6 @@ public class Expense implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public String getConfirmationCode() {
-		return confirmationCode;
-	}
-
-	public void setConfirmationCode(String confirmationCode) {
-		this.confirmationCode = confirmationCode;
 	}
 
 	public Date getDate() {
@@ -247,7 +233,7 @@ public class Expense implements Serializable {
 		if (obj.getClass() != getClass()) {
 			return false;
 		}
-		SpendingItem other = (SpendingItem) obj;
+		Spending other = (Spending) obj;
 		return new EqualsBuilder().append(this.getId(), other.getId()).append(this.getUuid(), other.getUuid())
 				.isEquals();
 	}
@@ -255,7 +241,7 @@ public class Expense implements Serializable {
 	@PrePersist
 	private void preCreate() {
 		this.uuid = RandomGeneratorUtils.getExpenseUuid();
-		long currentUserId = ApiSessionUtils.getApiSessionUserId();
+		long currentUserId = ApiSessionUtils.getCurrentUserId();
 
 		if (currentUserId > 0) {
 			this.createdBy = currentUserId;
@@ -265,7 +251,7 @@ public class Expense implements Serializable {
 	@PreUpdate
 	private void preUpdate() {
 
-		long currentUserId = ApiSessionUtils.getApiSessionUserId();
+		long currentUserId = ApiSessionUtils.getCurrentUserId();
 
 		if (currentUserId > 0) {
 			this.updatedBy = currentUserId;

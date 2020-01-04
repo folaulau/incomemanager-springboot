@@ -14,8 +14,10 @@ public class SessionDTO {
 	private String email;
 	private String userUuid;
 	private String accountUuid;
-	private String name;
+	private String firstName;
+	private String lastName;
 	private String profileSetupStatus;
+	private boolean primary;
 
 	public SessionDTO() {
 		super();
@@ -54,12 +56,20 @@ public class SessionDTO {
 		this.accountUuid = accountUuid;
 	}
 
-	public String getName() {
-		return name;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getProfileSetupStatus() {
@@ -68,6 +78,14 @@ public class SessionDTO {
 
 	public void setProfileSetupStatus(String profileSetupStatus) {
 		this.profileSetupStatus = profileSetupStatus;
+	}
+
+	public boolean isPrimary() {
+		return primary;
+	}
+
+	public void setPrimary(boolean primary) {
+		this.primary = primary;
 	}
 
 	@Override

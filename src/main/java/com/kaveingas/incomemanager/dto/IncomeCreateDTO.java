@@ -28,7 +28,7 @@ import org.hibernate.annotations.Where;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kaveingas.incomemanager.account.Account;
-import com.kaveingas.incomemanager.spending.SpendingItem;
+import com.kaveingas.incomemanager.spending.Spending;
 import com.kaveingas.incomemanager.user.User;
 import com.kaveingas.incomemanager.utils.ApiSessionUtils;
 import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;

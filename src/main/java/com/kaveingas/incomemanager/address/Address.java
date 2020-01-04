@@ -23,7 +23,7 @@ public class Address implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false, updatable = false, unique = true)
 	private Long id;
-	
+
 	@Column(name = "street")
 	private String street;
 
@@ -32,13 +32,19 @@ public class Address implements Serializable {
 
 	@Column(name = "city")
 	private String city;
-	
+
 	@Column(name = "state")
 	private String state;
 
 	@Column(name = "zipcode")
 	private String zip;
-	
+
+	@Column(name = "latitude")
+	private double lat;
+
+	@Column(name = "longitude")
+	private double lon;
+
 	public Address() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -92,5 +98,20 @@ public class Address implements Serializable {
 		this.zip = zip;
 	}
 
-}
+	public double getLat() {
+		return lat;
+	}
 
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+	public double getLon() {
+		return lon;
+	}
+
+	public void setLon(double lon) {
+		this.lon = lon;
+	}
+
+}

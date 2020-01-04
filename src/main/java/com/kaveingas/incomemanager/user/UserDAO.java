@@ -1,5 +1,7 @@
 package com.kaveingas.incomemanager.user;
 
+import com.kaveingas.incomemanager.dto.AccountStatsDTO;
+
 interface UserDAO {
 
 	User save(User user);
@@ -11,5 +13,7 @@ interface UserDAO {
 	User getByUuid(String uuid);
 
 	boolean doesEmailExist(String email);
+	
+	AccountStatsDTO getStats(String accountUuid);
 
 }

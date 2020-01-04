@@ -28,7 +28,7 @@ import org.hibernate.annotations.Where;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.kaveingas.incomemanager.account.Account;
-import com.kaveingas.incomemanager.spending.SpendingItem;
+import com.kaveingas.incomemanager.spending.Spending;
 import com.kaveingas.incomemanager.user.User;
 import com.kaveingas.incomemanager.utils.ApiSessionUtils;
 import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
@@ -36,7 +36,8 @@ import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
 @JsonInclude(value = Include.NON_NULL)
 @Entity
 @Where(clause = "deleted = 'F'")
-@Table(name = "income", indexes = { @Index(columnList = "uuid") , @Index(columnList = "user_id") })
+@Table(name = "income", indexes = { @Index(columnList = "uuid"), @Index(columnList = "user_id"),
+		@Index(columnList = "paycheck_net_amount") })
 public class Income implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -217,7 +218,7 @@ public class Income implements Serializable {
 		if (obj.getClass() != getClass()) {
 			return false;
 		}
-		SpendingItem other = (SpendingItem) obj;
+		Spending other = (Spending) obj;
 		return new EqualsBuilder().append(this.getId(), other.getId()).append(this.getUuid(), other.getUuid())
 				.isEquals();
 	}
@@ -225,7 +226,7 @@ public class Income implements Serializable {
 	@PrePersist
 	private void preCreate() {
 		this.uuid = RandomGeneratorUtils.getIncomeUuid();
-		long currentUserId = ApiSessionUtils.getApiSessionUserId();
+		long currentUserId = ApiSessionUtils.getCurrentUserId();
 
 		if (currentUserId > 0) {
 			this.createdBy = currentUserId;
@@ -236,7 +237,7 @@ public class Income implements Serializable {
 	@PreUpdate
 	private void preUpdate() {
 
-		long currentUserId = ApiSessionUtils.getApiSessionUserId();
+		long currentUserId = ApiSessionUtils.getCurrentUserId();
 
 		if (currentUserId > 0) {
 			this.updatedBy = currentUserId;

@@ -31,8 +31,9 @@ import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
 @JsonInclude(value = Include.NON_NULL)
 @Entity
 @Where(clause = "deleted = 'F'")
-@Table(name = "spending_item", indexes = { @Index(columnList = "uuid") })
-public class SpendingItem implements Serializable {
+@Table(name = "spending_item", indexes = { @Index(columnList = "uuid"), @Index(columnList = "user_id"),
+		@Index(columnList = "amount") })
+public class Spending implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -46,6 +47,9 @@ public class SpendingItem implements Serializable {
 
 	@Column(name = "user_id", nullable = false)
 	private Long userId;
+
+	@Column(name = "account_id", nullable = false)
+	private Long accountId;
 
 	@Column(name = "title")
 	private String title;
@@ -90,7 +94,7 @@ public class SpendingItem implements Serializable {
 	@Column(name = "updated_by")
 	private Long updatedBy;
 
-	public SpendingItem() {
+	public Spending() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -117,6 +121,14 @@ public class SpendingItem implements Serializable {
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+
+	public Long getAccountId() {
+		return accountId;
+	}
+
+	public void setAccountId(Long accountId) {
+		this.accountId = accountId;
 	}
 
 	public String getTitle() {
@@ -245,7 +257,7 @@ public class SpendingItem implements Serializable {
 		if (obj.getClass() != getClass()) {
 			return false;
 		}
-		SpendingItem other = (SpendingItem) obj;
+		Spending other = (Spending) obj;
 		return new EqualsBuilder().append(this.getId(), other.getId()).append(this.getUuid(), other.getUuid())
 				.append(this.getTitle(), other.getTitle()).append(this.getAmount(), other.getAmount()).isEquals();
 	}
@@ -253,22 +265,19 @@ public class SpendingItem implements Serializable {
 	@PrePersist
 	private void preCreate() {
 		this.uuid = RandomGeneratorUtils.getSpendingItemUuid();
-		long currentUserId = ApiSessionUtils.getApiSessionUserId();
+		long currentUserId = ApiSessionUtils.getCurrentUserId();
 
-		if (currentUserId > 0) {
-			this.createdBy = currentUserId;
-		}
+		this.createdBy = currentUserId;
+		this.accountId = ApiSessionUtils.getCurrentUserAccountId();
+		this.userId = ApiSessionUtils.getCurrentUserId();
 	}
 
 	@PreUpdate
 	private void preUpdate() {
 
-		long currentUserId = ApiSessionUtils.getApiSessionUserId();
+		long currentUserId = ApiSessionUtils.getCurrentUserId();
 
-		if (currentUserId > 0) {
-			this.updatedBy = currentUserId;
-		}
-
+		this.updatedBy = currentUserId;
 	}
 
 }

@@ -3,12 +3,16 @@ package com.kaveingas.incomemanager.account;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -21,8 +25,10 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.kaveingas.incomemanager.address.Address;
 import com.kaveingas.incomemanager.utils.ApiSessionUtils;
 import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
 
@@ -44,6 +50,11 @@ public class Account implements Serializable {
 
 	@Column(name = "profile_setup_status")
 	private String profileSetupStatus;
+
+	@JsonIgnoreProperties(value = { "account" })
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "address_id")
+	private Address address;
 
 	@Type(type = "true_false")
 	@Column(name = "deleted", columnDefinition = "char(1) default 'F'")
@@ -152,6 +163,14 @@ public class Account implements Serializable {
 
 	public void setProfileSetupStatus(String profileSetupStatus) {
 		this.profileSetupStatus = profileSetupStatus;
+	}
+
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
 	}
 
 	@Override
