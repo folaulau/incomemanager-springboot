@@ -68,7 +68,7 @@ public class UserDAOImp implements UserDAO {
 		queryBuilder.append("JOIN user ON user.id = income.user_id ");
 		queryBuilder.append("JOIN account as acct ON acct.id = user.account_id ");
 		queryBuilder.append("LEFT JOIN expense as exp ON user.id = exp.user_id ");
-		queryBuilder.append("LEFT JOIN spending_item as spend ON user.id = spend.user_id ");
+		queryBuilder.append("LEFT JOIN spending as spend ON user.id = spend.user_id ");
 		queryBuilder.append("GROUP BY acct.id ");
 		queryBuilder.append("HAVING acct.uuid = ? ");
 		

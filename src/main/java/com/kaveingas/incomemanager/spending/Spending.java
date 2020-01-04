@@ -31,7 +31,7 @@ import com.kaveingas.incomemanager.utils.RandomGeneratorUtils;
 @JsonInclude(value = Include.NON_NULL)
 @Entity
 @Where(clause = "deleted = 'F'")
-@Table(name = "spending_item", indexes = { @Index(columnList = "uuid"), @Index(columnList = "user_id"),
+@Table(name = "spending", indexes = { @Index(columnList = "uuid"), @Index(columnList = "user_id"),
 		@Index(columnList = "amount") })
 public class Spending implements Serializable {
 
