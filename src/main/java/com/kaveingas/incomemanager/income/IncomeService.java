@@ -6,6 +6,6 @@ import javax.validation.Valid;
 
 public interface IncomeService {
 
-	List<Income> save(List<Income> incomes);
+	List<Income> save(List<Income> incomes, String funnel);
 
 }

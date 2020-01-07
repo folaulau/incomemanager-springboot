@@ -64,4 +64,8 @@ public interface EntityDTOMapper {
 	SpendingDTO mapSpendingToSpendingDTO(Spending spending);
 	
 	List<SpendingDTO> mapSpendingsToSpendingDTOs(List<Spending> spendings);
+
+	Expense mapExpenseCreateDTOToExpense(ExpenseCreateDTO expenseDTO);
+	
+	List<ExpenseDTO> mapExpensesToExpenseDTOs(List<Expense> expenses);
 }

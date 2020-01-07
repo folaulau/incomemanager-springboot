@@ -17,6 +17,7 @@ import com.kaveingas.incomemanager.exception.ApiError;
 import com.kaveingas.incomemanager.exception.ApiException;
 import com.google.common.base.Optional;
 import com.kaveingas.incomemanager.account.Account;
+import com.kaveingas.incomemanager.account.FunnelType;
 import com.kaveingas.incomemanager.dto.AccountStatsDTO;
 import com.kaveingas.incomemanager.dto.EntityDTOMapper;
 import com.kaveingas.incomemanager.dto.NonPrimaryUserProfileUpdateDTO;
@@ -79,8 +80,11 @@ public class UserServiceImp implements UserService {
 		log.debug("signup(..)");
 		UserUtils.validateSignup(userDAO, signupRequest);
 
+		Account account = new Account();
+		account.setProfileSetupStatus(FunnelType.SIGNUP.getName());
+		
 		User user = this.entityDTOMapper.signupRequestToUser(signupRequest);
-		user.setAccount(new Account());
+		user.setAccount(account);
 		user.setPrimary(true);
 		user.setActive(true);
 
@@ -98,7 +102,7 @@ public class UserServiceImp implements UserService {
 	}
 
 	@Override
-	public UserProfileDTO updateProfile(UserProfileUpdateDTO userProfileUpdateDTO) {
+	public UserProfileDTO updateProfile(UserProfileUpdateDTO userProfileUpdateDTO, String funnel) {
 
 		User user = findByUuid(userProfileUpdateDTO.getUuid());
 
@@ -111,6 +115,12 @@ public class UserServiceImp implements UserService {
 
 			user = entityDTOMapper.patchNonPrimaryUser(user, nonPrimaryUserProfileUpdateDTO);
 
+		}
+		
+		FunnelType funnelType = FunnelType.getByName(funnel);
+		
+		if(funnel!=null && funnelType!=null && funnelType.equals(FunnelType.PROFILE)) {
+			user.getAccount().setProfileSetupStatus(FunnelType.DONE.getName());
 		}
 
 		user = this.userDAO.save(user);

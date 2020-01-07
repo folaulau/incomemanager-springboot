@@ -39,119 +39,122 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
-@Api(value = "users",produces = "Rest API for user operations", tags = "User Controller")
+@Api(value = "users", produces = "Rest API for user operations", tags = "User Controller")
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired
 	private UserService userService;
-	
-	
+
 	@Autowired
 	private EntityDTOMapper entityDTOMapper;
-	
+
 	@Autowired
 	private AuthenticationService authenticationService;
-	
+
 	/**
 	 * 
 	 * @param apiKey
 	 * @param user
 	 * @return
 	 */
-	
+
 	@ApiOperation(value = "Sign Up")
 	@PostMapping("/signup")
-	public ResponseEntity<SessionDTO> signUp(@ApiParam(name="user", required=true, value="user") @Valid @RequestBody SignupRequestDTO signupRequest,HttpServletRequest request){
+	public ResponseEntity<SessionDTO> signUp(
+			@ApiParam(name = "user", required = true, value = "user") @Valid @RequestBody SignupRequestDTO signupRequest,
+			HttpServletRequest request) {
 		log.debug("signUp(..)");
-		log.debug("signupRequest: {}",ObjectUtils.toJson(signupRequest));
+		log.debug("signupRequest: {}", ObjectUtils.toJson(signupRequest));
 		User user = userService.signUp(signupRequest);
-		
+
 		SessionDTO userSession = authenticationService.authenticate(user, request);
-		log.debug("userSession: {}",ObjectUtils.toJson(userSession));
-		
+		log.debug("userSession: {}", ObjectUtils.toJson(userSession));
+
 		return new ResponseEntity<>(userSession, HttpStatus.OK);
 	}
-	
-	
+
 	@ApiOperation(value = "Update Profile")
 	@PutMapping("/profile")
-	public ResponseEntity<UserProfileDTO> update(@RequestHeader("token") String token, @ApiParam(name="user", required=true, value="user") @Valid @RequestBody UserProfileUpdateDTO userProfileUpdateDTO){
+	public ResponseEntity<UserProfileDTO> update(@RequestHeader("token") String token,
+			@ApiParam(name = "funnel", required = false, value = "funnel") @RequestParam(required = false, name = "funnel") String funnel,
+			@ApiParam(name = "user", required = true, value = "user") @Valid @RequestBody UserProfileUpdateDTO userProfileUpdateDTO) {
 		log.debug("update(..)");
-		log.debug("userProfileUpdateDTO: {}",ObjectUtils.toJson(userProfileUpdateDTO));
-		
-		UserProfileDTO userProfileDTO = userService.updateProfile(userProfileUpdateDTO);
-		
+		log.debug("userProfileUpdateDTO: {}", ObjectUtils.toJson(userProfileUpdateDTO));
+
+		UserProfileDTO userProfileDTO = userService.updateProfile(userProfileUpdateDTO, funnel);
+
 		return new ResponseEntity<>(userProfileDTO, HttpStatus.OK);
 	}
-	
-	
+
 	@ApiOperation(value = "Get Profile")
 	@GetMapping("/profile")
-	public ResponseEntity<UserProfileDTO> getProfile(@RequestHeader("token") String token, @ApiParam(name="uuid", required=true, value="uuid") @RequestParam String uuid){
+	public ResponseEntity<UserProfileDTO> getProfile(@RequestHeader("token") String token,
+			@ApiParam(name = "uuid", required = true, value = "uuid") @RequestParam String uuid) {
 		log.debug("getProfile(..)");
 		log.debug("uuid: {}", uuid);
-		
+
 		UserProfileDTO userProfileDTO = userService.getProfile(uuid);
-		
+
 		return new ResponseEntity<>(userProfileDTO, HttpStatus.OK);
 	}
-	
+
 	@ApiOperation(value = "Get Stats")
 	@GetMapping("/account/stats")
-	public ResponseEntity<AccountStatsDTO> getStats(@RequestHeader("token") String token, @ApiParam(name="accountUuid", required=true, value="accountUuid") @RequestParam String accountUuid){
+	public ResponseEntity<AccountStatsDTO> getStats(@RequestHeader("token") String token,
+			@ApiParam(name = "accountUuid", required = true, value = "accountUuid") @RequestParam String accountUuid) {
 		log.debug("getStats(..)");
 		log.debug("accountUuid: {}", accountUuid);
-		
+
 		AccountStatsDTO accountStatsDTO = userService.getStats(accountUuid);
-		
+
 		return new ResponseEntity<>(accountStatsDTO, HttpStatus.OK);
 	}
-	
+
 	/**
-	 * This method is for show only. It does not get called on login.
-	 * Check CustomLoginFilter.java - Spring security set this up.
+	 * This method is for show only. It does not get called on login. Check
+	 * CustomLoginFilter.java - Spring security set this up.
 	 * 
 	 * @param apiKey
 	 * @param user
 	 * @return
 	 */
-	
+
 	@ApiOperation(value = "Login")
 	@PostMapping("/login")
-	public ResponseEntity<SessionDTO> login(@ApiParam(name="authorization", required=true, value="authorization") @Valid @RequestBody LoginRequestDTO loginRequestDTO){
+	public ResponseEntity<SessionDTO> login(
+			@ApiParam(name = "authorization", required = true, value = "authorization") @Valid @RequestBody LoginRequestDTO loginRequestDTO) {
 		log.info("login(...)");
 		return new ResponseEntity<>(new SessionDTO(), HttpStatus.OK);
 	}
-	
+
 	@ApiOperation(value = "Logout")
 	@DeleteMapping("/logout")
-	public ResponseEntity<?> logout(@RequestHeader("token") String token){
+	public ResponseEntity<?> logout(@RequestHeader("token") String token) {
 		log.info("logout(...)");
-		
+
 		ObjectNode result = ObjectUtils.getObjectNode();
 		result.put("status", "good");
-		
+
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
-	
 
-	
-	@Secured(value={RoleType.ROLE_USER})
+	@Secured(value = { RoleType.ROLE_USER })
 	@ApiOperation(value = "Get Member By Uuid")
 	@GetMapping("/users/{uuid}")
-	public ResponseEntity<UserDTO> getUserByUuid(@RequestHeader(name="token", required=true) String token, @ApiParam(name="uuid", required=true, value="uuid") @PathVariable("uuid") String uuid){
+	public ResponseEntity<UserDTO> getUserByUuid(@RequestHeader(name = "token", required = true) String token,
+			@ApiParam(name = "uuid", required = true, value = "uuid") @PathVariable("uuid") String uuid) {
 		log.debug("getUserByUuid(..)");
-		
+
 		User user = userService.getByUuid(uuid);
-		
+
 		UserDTO userDto = entityDTOMapper.userToUserDTO(user);
-		
-		log.debug("userDto: {}",ObjectUtils.toJson(userDto));
-		
+
+		log.debug("userDto: {}", ObjectUtils.toJson(userDto));
+
 		return new ResponseEntity<>(userDto, HttpStatus.OK);
 	}
 }

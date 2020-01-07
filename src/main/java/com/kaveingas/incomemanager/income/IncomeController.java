@@ -64,11 +64,12 @@ public class IncomeController {
 	@ApiOperation(value = "Add incomes")
 	@PostMapping
 	public ResponseEntity<List<Income>> save(@RequestHeader("token") String token,
+			@ApiParam(name = "funnel", required = false, value = "funnel") @RequestParam(required = false, name = "funnel") String funnel,
 			@ApiParam(name = "incomes", required = true, value = "incomes") @Valid @RequestBody List<Income> incomes) {
 		log.debug("add(..)");
 		log.debug("incomes: {}", ObjectUtils.toJson(incomes));
 
-		List<Income> savedIncomes = incomeService.save(incomes);
+		List<Income> savedIncomes = incomeService.save(incomes, funnel);
 
 		return new ResponseEntity<>(savedIncomes, HttpStatus.OK);
 	}

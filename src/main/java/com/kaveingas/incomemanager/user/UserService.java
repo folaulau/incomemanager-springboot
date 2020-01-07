@@ -22,7 +22,7 @@ public interface UserService {
 
 	User signUp(SignupRequestDTO signupRequest);
 
-	UserProfileDTO updateProfile(UserProfileUpdateDTO userProfileUpdateDTO);
+	UserProfileDTO updateProfile(UserProfileUpdateDTO userProfileUpdateDTO, String funnel);
 
 	UserProfileDTO getProfile(String uuid);
 

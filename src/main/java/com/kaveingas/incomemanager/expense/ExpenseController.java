@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kaveingas.incomemanager.dto.EntityDTOMapper;
 import com.kaveingas.incomemanager.dto.ExpenseCreateDTO;
+import com.kaveingas.incomemanager.dto.ExpenseDTO;
 import com.kaveingas.incomemanager.income.Income;
 import com.kaveingas.incomemanager.utils.ObjectUtils;
 
@@ -34,18 +36,17 @@ public class ExpenseController {
 	@Autowired
 	private ExpenseService expenseService;
 
-	@Autowired
-	private EntityDTOMapper entityDTOMapper;
 
 	@ApiOperation(value = "Add Expenses")
 	@PostMapping
-	public ResponseEntity<List<Expense>> save(
+	public ResponseEntity<List<ExpenseDTO>> save(
 			@RequestHeader("token") String token,
+			@ApiParam(name = "funnel", required = false, value = "funnel") @RequestParam(required = false, name = "funnel") String funnel,
 			@ApiParam(name = "expenses", required = true, value = "expenses") @Valid @RequestBody List<ExpenseCreateDTO> expenses) {
 		log.debug("add(..)");
 		log.debug("expenses: {}", ObjectUtils.toJson(expenses));
 
-		List<Expense> savedExpenses = expenseService.save(entityDTOMapper.mapExpenseCreateDTOsToExpenses(expenses));
+		List<ExpenseDTO> savedExpenses = expenseService.save(expenses, funnel);
 
 		return new ResponseEntity<>(savedExpenses, HttpStatus.OK);
 	}
