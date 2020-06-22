@@ -46,6 +46,10 @@ public class IncomemanagerApplication {
 				System.out.println("** Build: " + "0.0.102");
 				System.out.println("** Timezone: " + timeZone.getID());
 
+				InetAddress inetAddress = InetAddress.getLocalHost();
+				System.out.println("** IP Address:- " + inetAddress.getHostAddress());
+				System.out.println("** Host Name:- " + inetAddress.getHostName());
+
 				System.out.println("** Internal Url: http://localhost:" + env.getProperty("server.port"));
 				System.out.println("** External Url: http://" + InetAddress.getLocalHost().getHostAddress() + ":"
 						+ env.getProperty("server.port"));
